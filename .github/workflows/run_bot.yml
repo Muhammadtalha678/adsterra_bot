@@ -1,0 +1,34 @@
+name: Run Adsterra Impression Bot with UV
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '*/30 * * * *' # Microsoft Server cloud me har 30 min baad automatic isey run karega
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code Repository
+      uses: actions/checkout@v4
+
+    # 1. Setup Astrals Official UV environment compiler
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+        python-version: '3.14' # Matching your pyproject.toml specification
+
+    # 2. Synchronize project dependencies using lock settings
+    - name: Install Project Lock Constraints
+      run: uv sync
+
+    # 3. Playwright browser core layer download directly via uv
+    - name: Install Playwright Chromium Core Browser
+      run: uv run playwright install chromium
+
+    # 4. Fire the Python Script inside uv execution space
+    - name: Run Script Cloud Engine
+      run: uv run main.py
